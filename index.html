@@ -3,62 +3,229 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple CapCut Lite + Export + Mirror</title>
+<title>Simple CapCut Lite - Clean UI</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  video { max-width: 100%; margin-bottom: 10px; }
-  #timeline { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
-  .clip {
-    background: #007bff;
-    color: white;
-    padding: 5px;
-    margin: 2px;
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
+  /* Reset */
+  * {
+    box-sizing: border-box;
   }
-  .mirror-btn {
-    background: #28a745;
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    color: #00bcd4;
+    text-align: center;
+    user-select: none;
+  }
+
+  #appContainer {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 188, 212, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Input */
+  #videoInput {
+    margin-bottom: 15px;
+  }
+
+  /* Video Player */
+  #videoPlayer {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0, 188, 212, 0.5);
+    margin-bottom: 15px;
+  }
+
+  /* Controls container */
+  #controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  button {
+    background: #00bcd4;
     border: none;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
+    color: #121212;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    position: absolute;
-    top: 2px;
-    right: 2px;
+    transition: background 0.3s ease;
+    user-select: none;
+    box-shadow: 0 3px 8px rgba(0,188,212,0.5);
   }
-  .mirrored {
-    background: #ffc107 !important;
+
+  button:hover:not(:disabled) {
+    background: #00acc1;
   }
-  #projectSaveLoad { margin-top: 20px; }
-  #exportBtn { margin-top: 15px; }
+
+  button:disabled {
+    background: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Timeline */
+  #timelineContainer {
+    background: #262626;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px #000000;
+    margin-bottom: 25px;
+    min-height: 80px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .clip {
+    display: inline-flex;
+    align-items: center;
+    background: #00bcd4;
+    color: #121212;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-right: 12px;
+    font-weight: 600;
+    user-select: none;
+    position: relative;
+    box-shadow: 0 3px 8px rgba(0,188,212,0.5);
+  }
+  .clip.mirrored {
+    background: #ffc107;
+  }
+
+  .mirror-btn {
+    background: #121212;
+    color: #ffc107;
+    border: none;
+    border-radius: 6px;
+    margin-left: 10px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: inset 0 0 4px #000000;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .mirror-btn:hover {
+    background: #ffc107;
+    color: #121212;
+  }
+
+  /* Save/Load area */
+  #projectSaveLoad {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    justify-content: center;
+  }
+
+  #loadProjectInput {
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #00bcd4;
+    color: #121212;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(0,188,212,0.5);
+    border: none;
+    transition: background 0.3s ease;
+  }
+  #loadProjectInput:hover {
+    background: #00acc1;
+  }
+
+  /* Export button & status */
+  #exportBtn {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #00bcd4 0%, #00acc1 100%);
+    box-shadow: 0 5px 15px rgba(0,188,212,0.7);
+    user-select: none;
+  }
+
+  #exportBtn:hover:not(:disabled) {
+    background: linear-gradient(90deg, #00acc1 0%, #0097a7 100%);
+  }
+
+  #exportStatus {
+    margin-top: 12px;
+    min-height: 24px;
+    text-align: center;
+    font-weight: 600;
+    font-style: italic;
+    color: #00bcd4;
+    user-select: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    #controls {
+      flex-direction: column;
+      gap: 10px;
+    }
+    button {
+      width: 100%;
+    }
+    #projectSaveLoad {
+      flex-direction: column;
+      gap: 10px;
+    }
+    #loadProjectInput {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
 
-<h2>Simple CapCut Lite - Local + Export + Mirror</h2>
+<div id="appContainer">
+  <h2>Simple CapCut Lite</h2>
 
-<input type="file" id="videoInput" accept="video/*" multiple />
-<br />
+  <input type="file" id="videoInput" accept="video/*" multiple />
 
-<video id="videoPlayer" controls></video>
-<br />
+  <video id="videoPlayer" controls></video>
 
-<button id="trimStartBtn">Set Trim Start</button>
-<button id="trimEndBtn">Set Trim End</button>
-<button id="addClipBtn">Add Clip to Timeline</button>
+  <div id="controls">
+    <button id="trimStartBtn">Set Trim Start</button>
+    <button id="trimEndBtn">Set Trim End</button>
+    <button id="addClipBtn">Add Clip to Timeline</button>
+  </div>
 
-<h3>Timeline (click "Mirror" to toggle horizontal flip)</h3>
-<div id="timeline"></div>
+  <h3>Timeline (click "Mirror" to toggle horizontal flip)</h3>
+  <div id="timelineContainer">
+    <div id="timeline"></div>
+  </div>
 
-<div id="projectSaveLoad">
-  <button id="saveProjectBtn">Save Project</button>
-  <input type="file" id="loadProjectInput" />
+  <div id="projectSaveLoad">
+    <button id="saveProjectBtn">Save Project</button>
+    <input type="file" id="loadProjectInput" title="Load Project JSON" />
+  </div>
+
+  <button id="exportBtn">Export Video</button>
+  <div id="exportStatus"></div>
 </div>
-
-<button id="exportBtn">Export Video</button>
-<div id="exportStatus"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.7/dist/ffmpeg.min.js"></script>
 <script>
@@ -76,13 +243,12 @@
   const exportBtn = document.getElementById('exportBtn');
   const exportStatus = document.getElementById('exportStatus');
 
-  let loadedVideos = []; // {file: File, url: string, name: string}
+  let loadedVideos = [];
   let currentVideoIndex = 0;
 
   let trimStart = 0;
   let trimEnd = 0;
 
-  // timelineClips now also stores mirror state: {videoIndex, start, end, mirror}
   let timelineClips = [];
 
   videoInput.addEventListener('change', (e) => {
@@ -141,7 +307,6 @@
       const vidName = loadedVideos[clip.videoIndex].name;
       clipDiv.textContent = `${vidName}: ${clip.start.toFixed(2)}s - ${clip.end.toFixed(2)}s`;
 
-      // Mirror toggle button
       const mirrorBtn = document.createElement('button');
       mirrorBtn.className = 'mirror-btn';
       mirrorBtn.textContent = clip.mirror ? 'Mirrored' : 'Mirror';
@@ -156,7 +321,6 @@
     });
   }
 
-  // Save project to JSON file
   saveProjectBtn.onclick = () => {
     if(loadedVideos.length === 0){
       alert('Load videos first!');
@@ -174,7 +338,6 @@
     a.click();
   };
 
-  // Load project JSON file
   loadProjectInput.onchange = (e) => {
     const file = e.target.files[0];
     if(!file) return;
@@ -196,7 +359,6 @@
     reader.readAsText(file);
   };
 
-  // Export function with mirror support
   exportBtn.onclick = async () => {
     if(timelineClips.length === 0){
       alert('Add clips to timeline first!');
@@ -204,13 +366,13 @@
     }
 
     exportStatus.textContent = 'Loading FFmpeg... (this may take a while)';
+    exportBtn.disabled = true;
     if(!ffmpeg.isLoaded()) {
       await ffmpeg.load();
     }
 
     exportStatus.textContent = 'Preparing files...';
 
-    // Write all videos to FFmpeg FS
     for(let i=0; i<loadedVideos.length; i++){
       const file = loadedVideos[i].file;
       ffmpeg.FS('writeFile', file.name, await fetchFile(file));
@@ -230,7 +392,6 @@
       ];
 
       if(clip.mirror) {
-        // Add horizontal flip filter and re-encode (required when filter used)
         args.push(
           '-vf', 'hflip',
           '-c:v', 'libx264',
@@ -238,7 +399,6 @@
           '-c:a', 'copy'
         );
       } else {
-        // Just copy streams (fast trim)
         args.push('-c', 'copy');
       }
 
@@ -249,13 +409,11 @@
       await ffmpeg.run(...args);
     }
 
-    // Create concat list file for ffmpeg
     let concatFileContent = trimmedFiles.map(f => `file '${f}'`).join('\n');
     ffmpeg.FS('writeFile', 'concat_list.txt', concatFileContent);
 
     exportStatus.textContent = 'Merging clips...';
 
-    // Run concat command to merge all clips
     await ffmpeg.run(
       '-f', 'concat',
       '-safe', '0',
@@ -276,8 +434,10 @@
     a.click();
 
     exportStatus.textContent = 'Done! Your video is downloaded.';
+    exportBtn.disabled = false;
   };
 </script>
 
 </body>
 </html>
+
